@@ -1,0 +1,60 @@
+variables:
+  WORKDIR: "$CI_PROJECT_DIR/deployment"
+  KUBECTL_HELM_IMAGE: "ghcr.io/myorg/helm-kubectl"
+  NAMESPACE: env-dashboard
+
+stages:
+  - build
+  - deploy
+
+generate-index:
+  stage: build
+  image: python:3.12
+  script:
+    - pip install pyyaml
+    - python3 $CI_PROJECT_DIR/deployment/core-generate-index.py
+    - python3 $CI_PROJECT_DIR/deployment/portal-generate-index.py
+    - python3 $CI_PROJECT_DIR/deployment/monitoring-generate-index.py
+  artifacts:
+    paths:
+      - deployment/core-index.html
+      - deployment/portal-index.html
+      - deployment/monitoring-index.html
+  tags:
+    - my-runner
+  rules:
+    - changes:
+        - core-system/**
+        - client-portal/**
+        - monitoring-stack/**
+        - deployment/**
+        - .gitlab-ci.yml
+
+deploy:
+  dependencies:
+    - generate-index
+  stage: deploy
+  image: $KUBECTL_HELM_IMAGE
+  script:
+    - kubectl delete configmap nginx-dashboard-index -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig || true
+    - kubectl create configmap nginx-dashboard-index --from-file=index.html=$CI_PROJECT_DIR/deployment/index.html -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+
+    - kubectl delete configmap core-system-index -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig || true
+    - kubectl delete configmap portal-system-index -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig || true
+    - kubectl delete configmap monitoring-system-index -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig || true
+
+    - kubectl create configmap core-system-index --from-file=core-system-index.html=$CI_PROJECT_DIR/deployment/core-index.html -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+    - kubectl create configmap portal-system-index --from-file=portal-system-index.html=$CI_PROJECT_DIR/deployment/portal-index.html -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+    - kubectl create configmap monitoring-system-index --from-file=monitoring-system-index.html=$CI_PROJECT_DIR/deployment/monitoring-index.html -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+
+    - kubectl apply -f $WORKDIR/deployments.yaml -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+    - kubectl rollout restart deployment env-dashboard-app -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
+  tags:
+    - docker-runner
+  rules:
+    - changes:
+        - core-system/**
+        - client-portal/**
+        - monitoring-stack/**
+        - deployment/**
+        - .gitlab-ci.yml

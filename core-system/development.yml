@@ -1,0 +1,19 @@
+development:
+  main:
+    - https://service-main.dev.example.com/
+
+  zone-green:
+    - https://app-green.dev.example.com/
+    - https://kafka-green.dev.example.com/
+    - https://kibana-green.dev.example.com/
+
+  zone-grey:
+    - https://app-grey.dev.example.com/
+    - https://kafka-grey.dev.example.com/
+
+  zone-lime:
+    - https://app-lime.dev.example.com/
+
+  zone-brown:
+    - https://app-brown.dev.example.com/
+    - https://kafka-brown.dev.example.com/
