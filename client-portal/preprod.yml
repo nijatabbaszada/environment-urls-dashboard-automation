@@ -1,0 +1,3 @@
+preprod:
+  - https://k8s-portal-preprod.example.com/
+  - https://kibana-portal-preprod.example.com/

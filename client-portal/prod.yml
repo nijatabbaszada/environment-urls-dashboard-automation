@@ -1,0 +1,3 @@
+prod:
+  - https://k8s-portal-a.production.example.com/
+  - https://kibana-portal-production.example.com/
