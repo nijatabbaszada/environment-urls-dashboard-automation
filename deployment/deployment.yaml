@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: environment-urls-dashboard
+  labels:
+    app: environment-urls-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: environment-urls-dashboard
+  template:
+    metadata:
+      labels:
+        app: environment-urls-dashboard
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25-alpine
+          volumeMounts:
+            - name: root-page
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+
+            - name: core-page
+              mountPath: /usr/share/nginx/html/core-index.html
+              subPath: core-index.html
+
+            - name: portal-page
+              mountPath: /usr/share/nginx/html/portal-index.html
+              subPath: portal-index.html
+
+            - name: monitoring-page
+              mountPath: /usr/share/nginx/html/monitoring-index.html
+              subPath: monitoring-index.html
+
+      volumes:
+        - name: root-page
+          configMap:
+            name: root-index
+
+        - name: core-page
+          configMap:
+            name: core-index
+
+        - name: portal-page
+          configMap:
+            name: portal-index
+
+        - name: monitoring-page
+          configMap:
+            name: monitoring-index
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: environment-urls-dashboard-svc
+  labels:
+    app: environment-urls-dashboard
+spec:
+  selector:
+    app: environment-urls-dashboard
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: ClusterIP
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: environment-urls-dashboard-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - environment-urls.your-domain.com   # <-- BURANI ÖZ DOMENİN İLƏ ƏVƏZLƏ
+
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: environment-urls-dashboard
+spec:
+  hosts:
+    - environment-urls.your-domain.com      # <-- BURANI DA EYNİ
+  gateways:
+    - environment-urls-dashboard-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: environment-urls-dashboard-svc
+            port:
+              number: 80
