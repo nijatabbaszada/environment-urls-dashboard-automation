@@ -22,6 +22,18 @@ environment-urls-dashboard-automation/
 │
 └── .gitlab-ci.yml                    # GitLab CI/CD pipeline configuration
 ```
+## Backend Overview
+
+The system works as a static dashboard.  
+All backend logic runs during the CI/CD pipeline execution:
+
+- `Python scripts generate static HTML content from environment definitions.`
+- `The generated HTML is stored inside Kubernetes as ConfigMaps.`
+- `NGINX serves the dashboard as static files.`
+
+There is no runtime backend service or database.  
+Updating environment URLs and pushing to GitLab triggers a full regeneration of the dashboard.
+
 
 ### 🔗 How to Add a New URL
 
