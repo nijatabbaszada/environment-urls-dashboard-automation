@@ -7,7 +7,7 @@ This project provides a **centralised dashboard** that displays environment URLs
 ## Project Structure
 
 ```bash
-environment-dashboard/
+environment-urls-dashboard-automation/
 │
 ├── core-system/              # Core system environment URLs and config
 ├── client-portal/            # Client portal environment URLs and config
@@ -26,7 +26,8 @@ environment-dashboard/
 ### 🔗 How to Add a New URL
 
 To add a new service or system URL, follow these steps:
-1️⃣ Choose the correct environment folder
+
+1️⃣ **Choose the correct environment folder**
 
 Determine which system the URL belongs to:
 
@@ -36,7 +37,7 @@ Determine which system the URL belongs to:
 
 - `monitoring-stack/`
 
-2️⃣ Select the correct environment YAML file
+2️⃣ **Select the correct environment YAML file**
 
 - `prod.yaml` → Production environment
 
@@ -44,27 +45,28 @@ Determine which system the URL belongs to:
 
 - `develop.yaml` → Development environment
 
-3️⃣ Add the new URL entry
+3️⃣ **Add the new URL entry**
 
 Example modification in prod.yaml:
 
 ```bash
 prod:
-  - https://example-service-prod.company.local/
-  - https://new-service-prod.company.local/   # ✅ Newly added URL
+  - https://service-a.production.example.com/
+  - https://new-service-prod.example.com   # ✅ Newly added URL
 ```
 
-4️⃣ Push your changes to GitLab
-5️⃣ CI/CD Pipeline executes automatically
+4️⃣ **Push your changes to GitLab**
+
+5️⃣ **CI/CD Pipeline executes automatically**
 The pipeline will:
 
-- Generate updated HTML index files
+- `Generate updated HTML index files`
 
-- Update Kubernetes ConfigMaps
+- `Update Kubernetes ConfigMaps`
 
-- Restart the dashboard deployment
+- `Restart the dashboard deployment`
 
-6️⃣ Open the Dashboard to verify
+6️⃣ **Open the Dashboard to verify**
 
 After deployment completes, open:
 
