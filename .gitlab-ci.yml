@@ -21,7 +21,7 @@ generate-index:
       - deployment/portal-index.html
       - deployment/monitoring-index.html
   tags:
-    - my-runner
+    - your-runner
   rules:
     - changes:
         - core-system/**
@@ -50,7 +50,7 @@ deploy:
     - kubectl apply -f $WORKDIR/deployments.yaml -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
     - kubectl rollout restart deployment env-dashboard-app -n $NAMESPACE --kubeconfig=$yourclusterkubeconfig
   tags:
-    - docker-runner
+    - your-runner
   rules:
     - changes:
         - core-system/**
